@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCM Nexus v2.0</title>
+    <title>GCM Nexus v2.4: Custom Input Edition</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
     <script>
@@ -18,7 +21,8 @@
                         neonCyan: '#06b6d4',
                         neonPink: '#d946ef',
                         neonGreen: '#22c55e',
-                        neonYellow: '#eab308'
+                        neonYellow: '#eab308',
+                        danger: '#ef4444'
                     },
                     fontFamily: {
                         headers: ['Orbitron', 'sans-serif'],
@@ -59,7 +63,6 @@
         .card-hover { transition: all 0.3s ease; }
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.3); border-color: #06b6d4; }
         
-        /* Form Elements */
         .input-neon {
             background-color: #1e293b;
             border: 1px solid #475569;
@@ -71,10 +74,21 @@
             border-color: #06b6d4;
             box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
         }
+        
+        /* Custom Datalist Arrow Styling workaround (browser dependent) */
+        input[list]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.5;
+            cursor: pointer;
+        }
+        input[list]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative">
 
+    <!-- Navbar -->
     <nav class="bg-card border-b border-slate-700 sticky top-0 z-40 shadow-lg bg-opacity-95 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -89,7 +103,7 @@
                             Online: <span id="stat-online-count" class="text-white font-bold">0</span>
                         </div>
                     </div>
-                    <button id="btn-open-register" class="bg-gradient-to-r from-neonCyan to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-2 px-4 rounded shadow-lg shadow-cyan-500/30 transition-all transform hover:scale-105 flex items-center gap-2">
+                    <button onclick="openRegisterModal()" class="bg-gradient-to-r from-neonCyan to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-2 px-4 rounded shadow-lg shadow-cyan-500/30 transition-all transform hover:scale-105 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus"></i> Join Nexus
                     </button>
                 </div>
@@ -97,15 +111,17 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8 animate-fade-in">
         
+        <!-- Dashboard Section -->
         <section id="dashboard" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-card rounded-xl p-6 border border-slate-700 shadow-lg lg:col-span-2 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-trophy text-9xl"></i></div>
                 <h2 class="font-orbitron text-lg text-neonCyan mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
                     <i class="fa-solid fa-chart-simple"></i> Trending Games
                 </h2>
-                <div id="game-stats-container" class="space-y-4"></div>
+                <div id="game-stats-container" class="space-y-4"><!-- JS Populated --></div>
             </div>
 
             <div class="bg-card rounded-xl p-6 border border-slate-700 shadow-lg relative overflow-hidden">
@@ -113,7 +129,7 @@
                 <h2 class="font-orbitron text-lg text-neonPink mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
                     <i class="fa-solid fa-tags"></i> Genre Preference
                 </h2>
-                <div id="genre-stats-container" class="flex flex-wrap gap-2"></div>
+                <div id="genre-stats-container" class="flex flex-wrap gap-2"><!-- JS Populated --></div>
                 <div class="mt-8 bg-slate-800/50 p-4 rounded-lg border border-slate-700">
                     <h3 class="text-xs text-slate-400 uppercase tracking-widest mb-2">Community Status</h3>
                     <div class="flex justify-between items-center mb-1">
@@ -127,6 +143,7 @@
             </div>
         </section>
 
+        <!-- Member List Section -->
         <section id="members">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="font-orbitron text-2xl font-bold text-white flex items-center gap-2">
@@ -147,30 +164,42 @@
                 </div>
             </div>
 
-            <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+            <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"><!-- JS Populated --></div>
             <div id="no-results" class="hidden text-center py-20 text-slate-500">
                 <i class="fa-solid fa-ghost text-4xl mb-3 animate-bounce"></i><p>No operatives found.</p>
             </div>
         </section>
     </main>
 
+    <!-- Detail Modal -->
     <div id="member-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-card border border-slate-600 text-left shadow-2xl shadow-neonCyan/20 transition-all sm:my-8 sm:w-full sm:max-w-2xl animate-slide-up">
-                <button id="close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white z-10"><i class="fa-solid fa-xmark text-2xl"></i></button>
-                <div id="modal-content" class="bg-card pb-6"></div>
+                
+                <button id="close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white z-20"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                
+                <!-- Action Buttons -->
+                <div id="modal-actions" class="absolute top-4 left-4 z-20 flex gap-2">
+                    <!-- Injected by JS -->
+                </div>
+
+                <div id="modal-content" class="bg-card pb-6"><!-- JS Populated --></div>
             </div>
         </div>
     </div>
 
+    <!-- Register/Edit Modal (With Custom Game Input) -->
     <div id="register-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm" id="reg-backdrop"></div>
         <div class="flex min-h-full items-center justify-center p-4">
             <div class="relative bg-card border border-neonCyan rounded-lg shadow-2xl shadow-neonCyan/20 w-full max-w-lg p-6 animate-slide-up">
-                <h2 class="font-orbitron text-2xl text-white mb-6 border-b border-slate-700 pb-2">Initialize Profile</h2>
+                <h2 id="modal-title" class="font-orbitron text-2xl text-white mb-6 border-b border-slate-700 pb-2">Initialize Profile</h2>
                 
                 <form id="register-form" class="space-y-4">
+                    <input type="hidden" id="reg-id" value="">
+
+                    <!-- Name & Status -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Codename</label>
@@ -182,10 +211,12 @@
                                 <option value="Online">Online</option>
                                 <option value="Looking for Group">Looking for Group</option>
                                 <option value="Solo Play">Solo Play</option>
+                                <option value="In Game">In Game</option>
                             </select>
                         </div>
                     </div>
 
+                    <!-- Avatar Selection -->
                     <div>
                         <label class="block text-xs text-slate-400 mb-2">Select Avatar</label>
                         <div class="flex gap-4 justify-center bg-slate-800 p-3 rounded border border-slate-700">
@@ -216,156 +247,114 @@
                         </div>
                     </div>
 
+                    <!-- GAME PORTFOLIO MANAGEMENT -->
                     <div class="border-t border-slate-700 pt-4 mt-2">
-                        <label class="block text-xs text-neonCyan mb-2 font-bold uppercase">Main Game Data</label>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Game Title</label>
-                                <select id="reg-game" class="w-full input-neon rounded px-3 py-2 text-sm cursor-pointer">
-                                    </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs text-slate-400 mb-1">Progress (%)</label>
-                                    <input type="number" id="reg-progress" min="0" max="100" value="50" class="w-full input-neon rounded px-3 py-2 text-sm">
+                        <label class="block text-xs text-neonCyan mb-2 font-bold uppercase flex justify-between items-center">
+                            Active Games List
+                            <span class="text-[10px] text-slate-500 normal-case font-normal">Add known or custom games</span>
+                        </label>
+                        
+                        <!-- List of added games -->
+                        <div id="editor-game-list" class="space-y-2 mb-4 max-h-32 overflow-y-auto p-1 custom-scroll">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Add new game inputs -->
+                        <div class="bg-slate-800 p-3 rounded border border-slate-600 animate-fade-in">
+                            <h4 class="text-xs text-white mb-2 font-bold"><i class="fa-solid fa-plus-circle text-neonGreen mr-1"></i> Add Game Title</h4>
+                            <div class="space-y-2">
+                                <!-- Replaced Select with Input + Datalist for Custom Games -->
+                                <div class="relative">
+                                    <input type="text" id="new-game-title" list="game-options" class="w-full input-neon rounded px-2 py-1 text-xs mb-1" placeholder="Type or select game...">
+                                    <datalist id="game-options">
+                                        <!-- Options by JS -->
+                                    </datalist>
                                 </div>
-                                <div>
-                                    <label class="block text-xs text-slate-400 mb-1">Rank / Level</label>
-                                    <input type="text" id="reg-rank" placeholder="e.g. Gold IV" class="w-full input-neon rounded px-3 py-2 text-sm">
+
+                                <div class="flex gap-2">
+                                    <input type="number" id="new-game-progress" placeholder="Progress %" min="0" max="100" class="w-1/3 input-neon rounded px-2 py-1 text-xs">
+                                    <input type="text" id="new-game-rank" placeholder="Rank (e.g. Gold)" class="w-2/3 input-neon rounded px-2 py-1 text-xs">
                                 </div>
+                                <button type="button" onclick="addGameToEditor()" class="w-full bg-slate-700 hover:bg-neonGreen hover:text-black text-white text-xs py-1.5 rounded transition-colors mt-2 font-bold">
+                                    Add to List
+                                </button>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Actions -->
                     <div class="flex gap-3 pt-4">
                         <button type="button" id="btn-cancel-reg" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded text-sm transition-colors">Cancel</button>
-                        <button type="submit" class="flex-1 bg-neonCyan hover:bg-cyan-400 text-black font-bold py-2 rounded text-sm shadow-lg shadow-cyan-500/30 transition-colors">Initialize</button>
+                        <button type="submit" id="btn-submit-reg" class="flex-1 bg-neonCyan hover:bg-cyan-400 text-black font-bold py-2 rounded text-sm shadow-lg shadow-cyan-500/30 transition-colors">Initialize</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-4 right-4 bg-neonGreen text-black font-bold px-6 py-3 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
-        <i class="fa-solid fa-check-circle mr-2"></i> Registration Complete
+        <i class="fa-solid fa-check-circle mr-2"></i> <span id="toast-message">Action Complete</span>
     </div>
 
     <script>
         /**
-         * GCM Nexus v2.0 Logic
+         * GCM Nexus v2.4 Logic (Custom Game Input)
          */
 
-        // --- 1. GAME INTEL DATABASE (Static Data for Demo) ---
         const gameDatabase = {
-            'Apex Legends': {
-                icon: 'fa-crosshairs',
-                description: "部隊連携が鍵となるハイスピードなバトルロイヤルFPS。",
-                objective: "最後の1部隊（チャンピオン）になるまで生き残ること。",
-                appeal: "キャラクターごとの固有アビリティとスピード感あふれる戦闘が魅力。"
-            },
-            'Valorant': {
-                icon: 'fa-bullseye',
-                description: "5vs5のタクティカルシューター。精密な射撃とスキルが求められる。",
-                objective: "スパイクの設置/解除、または敵チームの殲滅。",
-                appeal: "戦略的なアビリティ活用と、競技性の高い緊張感。"
-            },
-            'Elden Ring': {
-                icon: 'fa-ring',
-                description: "広大なオープンワールドを探索するダークファンタジーアクションRPG。",
-                objective: "狭間の地を冒険し、エルデの王となる。",
-                appeal: "圧倒的な自由度と、手強いボスを倒した時の達成感。"
-            },
-            'League of Legends': {
-                icon: 'fa-shield-halved',
-                description: "100体以上のチャンピオンを操作し、拠点を破壊しあうMOBAの金字塔。",
-                objective: "敵チームのネクサス（本拠地）を破壊する。",
-                appeal: "チームワーク、戦略、個人のプレイスキルが複雑に絡み合う奥深さ。"
-            },
-            'Minecraft': {
-                icon: 'fa-cube',
-                description: "ブロックで構成された世界で、建築や冒険を自由に楽しめるサンドボックス。",
-                objective: "明確な目的はなく、建築、サバイバル、レッドストーン回路など無限大。",
-                appeal: "想像力をそのまま形にできる創造性と自由度。"
-            },
-            'Street Fighter 6': {
-                icon: 'fa-hand-fist',
-                description: "格闘ゲームの金字塔。モダン操作で初心者も参入しやすい。",
-                objective: "相手の体力を0にしてKOする。",
-                appeal: "読み合いの熱さと、自身の成長を実感できる対人戦の醍醐味。"
-            },
-            'Escape from Tarkov': {
-                icon: 'fa-person-military-rifle',
-                description: "極めてハードコアなFPS。倒されると装備を全ロストする緊張感。",
-                objective: "物資を集め、マップから生きて脱出する。",
-                appeal: "他に類を見ないリアリティと、ハイリスク・ハイリターンの興奮。"
-            },
-            'Monster Hunter': {
-                icon: 'fa-paw',
-                description: "巨大なモンスターを狩猟し、装備を強化していくハンティングアクション。",
-                objective: "クエストを受注し、指定されたモンスターを狩猟・捕獲する。",
-                appeal: "仲間との連携プレイと、素材を集めて装備を作るコレクション性。"
-            }
+            'Apex Legends': { icon: 'fa-crosshairs', description: "部隊連携が鍵となるハイスピードなバトルロイヤルFPS。", objective: "最後の1部隊（チャンピオン）になるまで生き残ること。", appeal: "キャラクターごとの固有アビリティとスピード感あふれる戦闘が魅力。" },
+            'Valorant': { icon: 'fa-bullseye', description: "5vs5のタクティカルシューター。精密な射撃とスキルが求められる。", objective: "スパイクの設置/解除、または敵チームの殲滅。", appeal: "戦略的なアビリティ活用と、競技性の高い緊張感。" },
+            'Elden Ring': { icon: 'fa-ring', description: "広大なオープンワールドを探索するダークファンタジーアクションRPG。", objective: "狭間の地を冒険し、エルデの王となる。", appeal: "圧倒的な自由度と、手強いボスを倒した時の達成感。" },
+            'League of Legends': { icon: 'fa-shield-halved', description: "100体以上のチャンピオンを操作し、拠点を破壊しあうMOBAの金字塔。", objective: "敵チームのネクサス（本拠地）を破壊する。", appeal: "チームワーク、戦略、個人のプレイスキルが複雑に絡み合う奥深さ。" },
+            'Minecraft': { icon: 'fa-cube', description: "ブロックで構成された世界で、建築や冒険を自由に楽しめるサンドボックス。", objective: "明確な目的はなく、建築、サバイバル、レッドストーン回路など無限大。", appeal: "想像力をそのまま形にできる創造性と自由度。" },
+            'Street Fighter 6': { icon: 'fa-hand-fist', description: "格闘ゲームの金字塔。モダン操作で初心者も参入しやすい。", objective: "相手の体力を0にしてKOする。", appeal: "読み合いの熱さと、自身の成長を実感できる対人戦の醍醐味。" },
+            'Escape from Tarkov': { icon: 'fa-person-military-rifle', description: "極めてハードコアなFPS。倒されると装備を全ロストする緊張感。", objective: "物資を集め、マップから生きて脱出する。", appeal: "他に類を見ないリアリティと、ハイリスク・ハイリターンの興奮。" },
+            'Monster Hunter': { icon: 'fa-paw', description: "巨大なモンスターを狩猟し、装備を強化していくハンティングアクション。", objective: "クエストを受注し、指定されたモンスターを狩猟・捕獲する。", appeal: "仲間との連携プレイと、素材を集めて装備を作るコレクション性。" }
         };
+        // Default info for custom games
+        const defaultGameInfo = { icon: 'fa-gamepad', description: "Custom game added by user.", objective: "No database info.", appeal: "Check profile for details." };
 
-        // Fallback for custom games
-        const defaultGameInfo = {
-            icon: 'fa-gamepad',
-            description: "No database info available for this title.",
-            objective: "Complete the game objectives.",
-            appeal: "Check user profile for details."
-        };
-
-        // --- 2. DATA MANAGEMENT ---
+        // Data Management
         const generateDummyData = () => {
             const gameKeys = Object.keys(gameDatabase);
             const statuses = ['Online', 'In Game', 'Looking for Group', 'Offline'];
-            
             const users = [
                 { name: "NeonSamurai", avatar: "fa-user-ninja", color: "text-neonPink" },
                 { name: "PixelPanda", avatar: "fa-robot", color: "text-neonCyan" },
                 { name: "SniperWolf", avatar: "fa-user-secret", color: "text-slate-300" },
-                { name: "HealerMain", avatar: "fa-user-nurse", color: "text-neonGreen" },
-                { name: "TankDempsey", avatar: "fa-user-shield", color: "text-neonYellow" },
-                { name: "SpeedRunner", avatar: "fa-bolt", color: "text-orange-400" },
-                { name: "LoreMaster", avatar: "fa-book-skull", color: "text-purple-400" },
-                { name: "BuilderBob", avatar: "fa-hammer", color: "text-yellow-600" }
+                { name: "HealerMain", avatar: "fa-user-nurse", color: "text-neonGreen" }
             ];
 
             return users.map((u, index) => {
-                // Randomly assign games
                 const userGames = Array.from({length: Math.floor(Math.random() * 2) + 1}, () => {
                     const title = gameKeys[Math.floor(Math.random() * gameKeys.length)];
                     return {
                         title: title,
                         progress: Math.floor(Math.random() * 100) + 1,
-                        rank: ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'][Math.floor(Math.random() * 5)]
+                        rank: ['Gold', 'Plat', 'Diamond'][Math.floor(Math.random() * 3)]
                     };
                 }).filter((v,i,a) => a.findIndex(t => t.title === v.title) === i);
-
-                const status = statuses[Math.floor(Math.random() * statuses.length)];
-                
-                // Derive genres from games logic (Simplified for demo)
-                const genres = ['FPS', 'RPG', 'MOBA'].filter(() => Math.random() > 0.5);
-                if(genres.length === 0) genres.push('Casual');
 
                 return {
                     id: index + 1,
                     name: u.name,
                     avatar: u.avatar,
                     avatarColor: u.color,
-                    genres: genres,
+                    genres: ['Gamer'],
                     games: userGames,
-                    status: status,
-                    lastSeen: `${Math.floor(Math.random() * 12)}h ago`
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    lastSeen: '2h ago'
                 };
             });
         };
 
         let members = generateDummyData();
         let currentFilter = { text: '', status: 'all' };
+        
+        let tempEditorGames = [];
 
-        // --- 3. UI RENDERING ---
-
+        // UI Helpers
         const getStatusBadge = (status) => {
             const colors = {
                 'Online': 'bg-green-500/20 text-green-400 border-green-500/50',
@@ -378,15 +367,12 @@
         };
 
         const renderDashboard = () => {
-            // Stats
             document.getElementById('stat-online-count').textContent = members.filter(m => m.status !== 'Offline').length;
-
             const lfgCount = members.filter(m => m.status === 'Looking for Group').length;
             const lfgPercent = members.length > 0 ? Math.round((lfgCount / members.length) * 100) : 0;
             document.getElementById('lfg-percentage').textContent = `${lfgPercent}%`;
             document.getElementById('lfg-bar').style.width = `${lfgPercent}%`;
 
-            // Charts (Simplified)
             const gameCounts = {};
             members.forEach(m => m.games.forEach(g => gameCounts[g.title] = (gameCounts[g.title] || 0) + 1));
             
@@ -403,7 +389,6 @@
                         </div>
                     </div>`).join('');
             
-            // Genre Tags
             const genreCounts = {};
             members.forEach(m => m.genres.forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1));
             document.getElementById('genre-stats-container').innerHTML = Object.entries(genreCounts)
@@ -448,15 +433,14 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-white text-lg leading-tight group-hover:text-neonCyan transition-colors">${member.name}</h3>
-                                <div class="text-xs text-slate-400 mt-1">${member.genres.join(', ')}</div>
+                                <div class="text-xs text-slate-400 mt-1">${member.games.length} Active Games</div>
                             </div>
                         </div>
                         ${getStatusBadge(member.status)}
                     </div>
                     <div class="bg-slate-800/50 rounded p-2 border border-slate-700/50">
                         <div class="flex justify-between text-xs text-slate-400 mb-1">
-                            <span>Playing</span>
-                            <span class="text-neonCyan">${mainGame.rank}</span>
+                            <span>Main: ${mainGame.rank}</span>
                         </div>
                         <div class="text-sm font-medium text-slate-200 truncate">
                             <i class="fa-solid ${gameInfo.icon} mr-1 text-slate-500"></i> ${mainGame.title}
@@ -467,12 +451,21 @@
             });
         };
 
-        // --- 4. MODAL & DETAILS ---
+        // Modal Logic
         const openModal = (id) => {
             const member = members.find(m => m.id === id);
             if (!member) return;
 
-            // Generate Game Cards with Accordion/Details
+            const actionsDiv = document.getElementById('modal-actions');
+            actionsDiv.innerHTML = `
+                <button onclick="openRegisterModal(${member.id})" class="bg-slate-800/80 hover:bg-neonCyan/20 hover:text-neonCyan text-slate-300 text-xs px-3 py-1.5 rounded border border-slate-600 backdrop-blur transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-pen"></i> Edit Profile
+                </button>
+                <button onclick="deleteMember(${member.id})" class="bg-slate-800/80 hover:bg-danger/20 hover:text-danger text-slate-300 text-xs px-3 py-1.5 rounded border border-slate-600 backdrop-blur transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
+
             const gamesHtml = member.games.map(g => {
                 const info = gameDatabase[g.title] || defaultGameInfo;
                 return `
@@ -519,11 +512,10 @@
                 <div class="px-6 pt-10">
                     <h2 class="text-2xl font-bold text-white font-orbitron">${member.name}</h2>
                     <p class="text-slate-400 text-sm mt-1">ID: #000${member.id}</p>
-                    
                     <div class="mt-6">
-                        <h3 class="text-sm uppercase tracking-wider text-slate-500 font-bold mb-3">Active Games & Details</h3>
+                        <h3 class="text-sm uppercase tracking-wider text-slate-500 font-bold mb-3">Game Portfolio</h3>
                         <div class="max-h-80 overflow-y-auto pr-2 custom-scroll">
-                            ${gamesHtml}
+                            ${gamesHtml.length ? gamesHtml : '<p class="text-slate-500 text-sm italic">No active games listed.</p>'}
                         </div>
                     </div>
                 </div>
@@ -531,68 +523,154 @@
             document.getElementById('member-modal').classList.remove('hidden');
         };
 
-        const closeModal = (id) => {
-            document.getElementById(id).classList.add('hidden');
+        const deleteMember = (id) => {
+            if(confirm("Are you sure you want to delete this operative?")) {
+                members = members.filter(m => m.id !== id);
+                document.getElementById('member-modal').classList.add('hidden');
+                renderDashboard();
+                renderMembers();
+                showToast("Operative Deleted", "bg-red-500");
+            }
         };
 
-        // --- 5. REGISTRATION LOGIC ---
+        const closeModal = (id) => { document.getElementById(id).classList.add('hidden'); };
+
+        // --- Register/Edit Modal Logic ---
         const regModal = document.getElementById('register-modal');
         const regForm = document.getElementById('register-form');
-        const gameSelect = document.getElementById('reg-game');
+        const gameInput = document.getElementById('new-game-title');
+        const gameOptions = document.getElementById('game-options');
+        const editorList = document.getElementById('editor-game-list');
 
-        // Populate Game Select
-        Object.keys(gameDatabase).forEach(game => {
-            const option = document.createElement('option');
-            option.value = game;
-            option.textContent = game;
-            gameSelect.appendChild(option);
-        });
+        // Populate Datalist Options
+        gameOptions.innerHTML = Object.keys(gameDatabase).map(g => `<option value="${g}">`).join('');
 
-        document.getElementById('btn-open-register').onclick = () => regModal.classList.remove('hidden');
+        window.openRegisterModal = (id = null) => {
+            const isEdit = id !== null;
+            document.getElementById('member-modal').classList.add('hidden');
+            
+            document.getElementById('modal-title').textContent = isEdit ? "Update Profile" : "Initialize Profile";
+            document.getElementById('btn-submit-reg').textContent = isEdit ? "Save Changes" : "Initialize";
+            document.getElementById('reg-id').value = isEdit ? id : "";
+
+            if (isEdit) {
+                const m = members.find(mem => mem.id === id);
+                document.getElementById('reg-name').value = m.name;
+                document.getElementById('reg-status').value = m.status;
+                const radios = document.getElementsByName('avatar');
+                for(let r of radios) { r.checked = (r.value === m.avatar); }
+                
+                // Deep Copy games
+                tempEditorGames = JSON.parse(JSON.stringify(m.games));
+            } else {
+                regForm.reset();
+                document.getElementsByName('avatar')[0].checked = true;
+                tempEditorGames = [];
+            }
+            renderEditorGames();
+            regModal.classList.remove('hidden');
+        };
+
+        // Editor Game List Methods
+        window.renderEditorGames = () => {
+            if(tempEditorGames.length === 0) {
+                editorList.innerHTML = `<div class="text-center text-xs text-slate-500 py-2 border border-dashed border-slate-700 rounded">No games added. Add one below.</div>`;
+                return;
+            }
+            editorList.innerHTML = tempEditorGames.map((g, idx) => `
+                <div class="flex items-center justify-between bg-slate-900/50 p-2 rounded border border-slate-700/50">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fa-solid ${gameDatabase[g.title]?.icon || 'fa-gamepad'} text-slate-400"></i>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-white font-bold truncate w-24">${g.title}</span>
+                            <span class="text-[10px] text-slate-400">Rank: ${g.rank} | ${g.progress}%</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="deleteGameFromEditor(${idx})" class="text-slate-500 hover:text-red-400 transition-colors p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        };
+
+        window.addGameToEditor = () => {
+            const title = gameInput.value.trim(); // Get value from input, not select
+            const progress = document.getElementById('new-game-progress').value || 0;
+            const rank = document.getElementById('new-game-rank').value || 'Beginner';
+
+            if (!title) {
+                showToast("Please enter a game title!", "bg-neonYellow");
+                return;
+            }
+
+            // Check duplicate
+            if(tempEditorGames.some(g => g.title.toLowerCase() === title.toLowerCase())) {
+                showToast("Game already in list!", "bg-neonYellow");
+                return;
+            }
+
+            tempEditorGames.push({ title, progress, rank });
+            renderEditorGames();
+            
+            // Clear inputs
+            gameInput.value = '';
+            document.getElementById('new-game-progress').value = '';
+            document.getElementById('new-game-rank').value = '';
+        };
+
+        window.deleteGameFromEditor = (index) => {
+            tempEditorGames.splice(index, 1);
+            renderEditorGames();
+        };
+
+        // Form Submit
         document.getElementById('btn-cancel-reg').onclick = () => regModal.classList.add('hidden');
         document.getElementById('reg-backdrop').onclick = () => regModal.classList.add('hidden');
 
         regForm.onsubmit = (e) => {
             e.preventDefault();
-            
+            const idVal = document.getElementById('reg-id').value;
             const name = document.getElementById('reg-name').value;
             const status = document.getElementById('reg-status').value;
             const avatar = document.querySelector('input[name="avatar"]:checked').value;
-            const gameTitle = gameSelect.value;
-            const progress = document.getElementById('reg-progress').value;
-            const rank = document.getElementById('reg-rank').value || 'Beginner';
 
-            const newMember = {
-                id: members.length + 100, // Dummy ID
-                name: name,
-                avatar: avatar,
-                avatarColor: 'text-white', // Default
-                genres: [gameDatabase[gameTitle]?.genre || 'Gamer'], // Simplified genre logic
-                games: [{
-                    title: gameTitle,
-                    progress: progress,
-                    rank: rank
-                }],
-                status: status,
-                lastSeen: 'Just now'
-            };
-
-            members.unshift(newMember); // Add to top
-            
-            // UI Feedback
+            if (idVal) {
+                // UPDATE
+                const idx = members.findIndex(m => m.id == idVal);
+                if(idx !== -1) {
+                    members[idx] = { ...members[idx], name, status, avatar, games: tempEditorGames };
+                    showToast("Profile Updated");
+                }
+            } else {
+                // CREATE
+                const newMember = {
+                    id: Date.now(),
+                    name, status, avatar,
+                    avatarColor: 'text-white',
+                    genres: ['Gamer'],
+                    games: tempEditorGames,
+                    lastSeen: 'Just now'
+                };
+                members.unshift(newMember);
+                showToast("Welcome to Nexus!");
+            }
             regModal.classList.add('hidden');
             renderDashboard();
             renderMembers();
-            regForm.reset();
+        };
 
+        const showToast = (msg, bgClass = "bg-neonGreen") => {
             const toast = document.getElementById('toast');
-            toast.classList.remove('opacity-0', 'translate-y-20');
+            document.getElementById('toast-message').textContent = msg;
+            toast.className = `fixed bottom-4 right-4 ${bgClass} text-black font-bold px-6 py-3 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50`;
+            requestAnimationFrame(() => toast.classList.remove('opacity-0', 'translate-y-20'));
             setTimeout(() => toast.classList.add('opacity-0', 'translate-y-20'), 3000);
         };
 
-        // --- 6. GLOBAL LISTENERS ---
+        // Global Listeners
         document.getElementById('close-modal').onclick = () => closeModal('member-modal');
         document.getElementById('modal-backdrop').onclick = () => closeModal('member-modal');
+        
         document.getElementById('search-input').addEventListener('input', (e) => {
             currentFilter.text = e.target.value.toLowerCase();
             renderMembers();
@@ -602,7 +680,7 @@
             renderMembers();
         });
 
-        // Initialize
+        // Init
         renderDashboard();
         renderMembers();
 

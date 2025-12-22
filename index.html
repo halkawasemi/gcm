@@ -3,43 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCM TACTICAL OS v3.0</title>
+    <title>GCM Nexus v2.4: Custom Input Edition</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        // タクティカルパレット
-                        tacBlack: '#0a0a0a',     // 深黒
-                        tacDark: '#121212',      // 背景
-                        tacPanel: '#1e1e1e',     // パネル背景
-                        tacGray: '#3f3f46',      // 非活性/境界線
-                        
-                        // アクセントカラー (HUD)
-                        tacAmber: '#fbbf24',     // 主力アクセント（警告・注目）
-                        tacGreen: '#10b981',     // 正常・オンライン
-                        tacRed: '#ef4444',       // 敵性・削除
-                        tacCyan: '#06b6d4',      // 情報・システム
-                        
-                        // ミリタリー
-                        coyote: '#81613c',
+                        dark: '#0f172a',
+                        card: '#1e293b',
+                        neonCyan: '#06b6d4',
+                        neonPink: '#d946ef',
+                        neonGreen: '#22c55e',
+                        neonYellow: '#eab308',
+                        danger: '#ef4444'
                     },
                     fontFamily: {
-                        stencil: ['Black Ops One', 'cursive'],
-                        tech: ['Rajdhani', 'sans-serif']
+                        headers: ['Orbitron', 'sans-serif'],
+                        body: ['Roboto', 'sans-serif']
                     },
                     animation: {
-                        'scanline': 'scanline 8s linear infinite',
-                        'blink': 'blink 2s infinite',
-                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out'
                     },
                     keyframes: {
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        blink: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0.5' } }
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
                     }
                 }
             }
@@ -47,327 +48,282 @@
     </script>
     <style>
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: #0a0a0a;
-            color: #d4d4d8;
-            /* 戦術グリッド背景 */
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
         }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
 
-        /* スクロールバーの軍事化 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #121212; }
-        ::-webkit-scrollbar-thumb { background: #3f3f46; border: 1px solid #121212; }
-        ::-webkit-scrollbar-thumb:hover { background: #fbbf24; }
-
-        /* 入力フォームのコンソール化 */
-        .input-tac {
-            background-color: #121212;
-            border: 1px solid #3f3f46;
-            color: #fbbf24;
-            font-family: 'Rajdhani', monospace;
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.3); border-color: #06b6d4; }
+        
+        .input-neon {
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            color: white;
             transition: all 0.2s;
         }
-        .input-tac:focus {
+        .input-neon:focus {
             outline: none;
-            border-color: #fbbf24;
-            background-color: #1a1a1a;
-            box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+            border-color: #06b6d4;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
         }
         
-        /* カードの角張りとボーダーエフェクト */
-        .card-tac {
-            background-color: #1e1e1e;
-            border: 1px solid #3f3f46;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-        /* 四隅のコーナーマーク（装飾） */
-        .card-tac::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 10px; height: 10px;
-            border-top: 2px solid #3f3f46;
-            border-right: 2px solid #3f3f46;
-            transition: all 0.2s;
-        }
-        .card-tac:hover {
-            border-color: #fbbf24;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-        .card-tac:hover::after {
-            border-color: #fbbf24;
-        }
-
-        /* 選択リストの矢印反転 */
+        /* Custom Datalist Arrow Styling workaround (browser dependent) */
         input[list]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             opacity: 0.5;
             cursor: pointer;
         }
+        input[list]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col relative">
 
-    <nav class="bg-tacPanel/90 border-b border-tacGray sticky top-0 z-40 backdrop-blur-md">
+    <!-- Navbar -->
+    <nav class="bg-card border-b border-slate-700 sticky top-0 z-40 shadow-lg bg-opacity-95 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3 group cursor-pointer" onclick="location.reload()">
-                    <div class="border border-tacAmber p-1 rounded-none group-hover:bg-tacAmber/10 transition-colors">
-                        <i class="fa-solid fa-crosshairs text-tacAmber text-xl"></i>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="font-stencil text-xl text-white tracking-widest leading-none">GCM<span class="text-tacAmber">OS</span></span>
-                        <span class="text-[10px] text-tacGray tracking-[0.2em] font-bold">TACTICAL NEXUS</span>
-                    </div>
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-gamepad text-neonCyan text-2xl animate-pulse"></i>
+                    <span class="font-orbitron text-xl font-bold tracking-wider text-white cursor-pointer" onclick="location.reload()">GCM <span class="text-neonPink">NEXUS</span></span>
                 </div>
-
                 <div class="flex items-center gap-4">
-                    <div class="hidden md:flex space-x-4 items-center">
-                        <div class="flex items-center gap-2 text-xs font-mono text-tacGray border-r border-tacGray pr-4">
-                            <span class="animate-pulse text-tacGreen">●</span> SYSTEM ONLINE
-                        </div>
-                        <div class="bg-black/50 px-3 py-1 border border-tacGray text-xs text-tacGray font-mono">
-                            OPERATIVES: <span id="stat-online-count" class="text-white font-bold text-sm">0</span>
+                    <div class="hidden md:flex space-x-4">
+                        <div class="bg-slate-800 px-3 py-1 rounded-full text-xs text-slate-400 border border-slate-700">
+                            <span class="w-2 h-2 rounded-full bg-neonGreen inline-block mr-1"></span>
+                            Online: <span id="stat-online-count" class="text-white font-bold">0</span>
                         </div>
                     </div>
-                    
-                    <button onclick="openRegisterModal()" class="group relative overflow-hidden bg-tacAmber/10 hover:bg-tacAmber text-tacAmber hover:text-black border border-tacAmber font-bold py-1.5 px-4 transition-all duration-300">
-                        <span class="relative z-10 flex items-center gap-2 font-mono text-sm">
-                            <i class="fa-solid fa-plus-square"></i> INITIALIZE
-                        </span>
+                    <button onclick="openRegisterModal()" class="bg-gradient-to-r from-neonCyan to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-2 px-4 rounded shadow-lg shadow-cyan-500/30 transition-all transform hover:scale-105 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Join Nexus
                     </button>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8 animate-fade-in">
         
+        <!-- Dashboard Section -->
         <section id="dashboard" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="card-tac p-6 lg:col-span-2">
-                <div class="absolute top-2 right-3 text-tacGray/20 text-6xl font-stencil z-0">TOP</div>
-                <h2 class="font-stencil text-lg text-tacAmber mb-4 border-b border-tacGray pb-2 flex items-center gap-2 relative z-10">
-                    <i class="fa-solid fa-chart-radar"></i> ACTIVE SIMULATIONS
+            <div class="bg-card rounded-xl p-6 border border-slate-700 shadow-lg lg:col-span-2 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-trophy text-9xl"></i></div>
+                <h2 class="font-orbitron text-lg text-neonCyan mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-simple"></i> Trending Games
                 </h2>
-                <div id="game-stats-container" class="space-y-4 relative z-10"></div>
+                <div id="game-stats-container" class="space-y-4"><!-- JS Populated --></div>
             </div>
 
-            <div class="card-tac p-6">
-                <div class="absolute bottom-2 right-3 text-tacGray/20 text-6xl font-stencil z-0">DATA</div>
-                <h2 class="font-stencil text-lg text-white mb-4 border-b border-tacGray pb-2 flex items-center gap-2 relative z-10">
-                    <i class="fa-solid fa-fingerprint text-tacGray"></i> UNIT COMPOSITION
+            <div class="bg-card rounded-xl p-6 border border-slate-700 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-chart-pie text-9xl"></i></div>
+                <h2 class="font-orbitron text-lg text-neonPink mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-tags"></i> Genre Preference
                 </h2>
-                <div id="genre-stats-container" class="flex flex-wrap gap-2 relative z-10"></div>
-                
-                <div class="mt-8 bg-black/40 p-4 border border-tacGray/50 relative z-10">
-                    <h3 class="text-xs text-tacGray font-mono uppercase tracking-widest mb-2">REINFORCEMENT REQUESTS (LFG)</h3>
-                    <div class="flex justify-between items-end mb-1">
-                        <span class="text-xs text-tacAmber animate-blink">SIGNAL STRENGTH</span>
-                        <span id="lfg-percentage" class="text-xl font-bold text-white font-mono">0%</span>
+                <div id="genre-stats-container" class="flex flex-wrap gap-2"><!-- JS Populated --></div>
+                <div class="mt-8 bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <h3 class="text-xs text-slate-400 uppercase tracking-widest mb-2">Community Status</h3>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm">Recruiting (LFG)</span>
+                        <span id="lfg-percentage" class="text-sm font-bold text-neonGreen">0%</span>
                     </div>
-                    <div class="w-full bg-tacDark h-1 border border-tacGray/30">
-                        <div id="lfg-bar" class="bg-tacAmber h-full transition-all duration-1000" style="width: 0%"></div>
+                    <div class="w-full bg-slate-700 rounded-full h-2">
+                        <div id="lfg-bar" class="bg-neonGreen h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Member List Section -->
         <section id="members">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <h2 class="font-stencil text-2xl text-white flex items-center gap-2 tracking-wide">
-                    <i class="fa-solid fa-users-line text-tacGray"></i> DEPLOYED OPERATIVES
+                <h2 class="font-orbitron text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-users-viewfinder text-neonCyan"></i> Operatives
                 </h2>
-                
-                <div class="flex flex-wrap gap-0 w-full md:w-auto border border-tacGray bg-tacPanel">
-                    <div class="relative flex-grow md:flex-grow-0 border-r border-tacGray">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-tacGray text-xs"></i>
-                        <input type="text" id="search-input" placeholder="SEARCH SIGNATURE..." 
-                            class="bg-transparent text-white text-sm pl-8 pr-3 py-2 w-full md:w-56 focus:outline-none focus:bg-white/5 font-mono uppercase placeholder-tacGray">
+                <div class="flex flex-wrap gap-3 w-full md:w-auto bg-card p-2 rounded-lg border border-slate-700">
+                    <div class="relative flex-grow md:flex-grow-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
+                        <input type="text" id="search-input" placeholder="Search name or game..." 
+                            class="bg-slate-800 text-white text-sm rounded-md pl-9 pr-3 py-2 border border-slate-600 focus:outline-none focus:border-neonCyan w-full md:w-48">
                     </div>
-                    <select id="status-filter" class="bg-transparent text-white text-sm px-3 py-2 focus:outline-none focus:bg-white/5 font-mono uppercase cursor-pointer">
-                        <option value="all" class="bg-tacPanel">ALL UNITS</option>
-                        <option value="Looking for Group" class="bg-tacPanel">LFG (REQ)</option>
-                        <option value="Online" class="bg-tacPanel">ONLINE</option>
-                        <option value="In Game" class="bg-tacPanel">IN MISSION</option>
+                    <select id="status-filter" class="bg-slate-800 text-white text-sm rounded-md px-3 py-2 border border-slate-600 focus:outline-none focus:border-neonCyan cursor-pointer">
+                        <option value="all">All Status</option>
+                        <option value="Looking for Group">LFG</option>
+                        <option value="Online">Online</option>
+                        <option value="In Game">In Game</option>
                     </select>
                 </div>
             </div>
 
-            <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-            
-            <div id="no-results" class="hidden text-center py-20 text-tacGray">
-                <i class="fa-solid fa-satellite-dish text-4xl mb-3 opacity-50"></i>
-                <p class="font-mono text-sm">NO SIGNAL DETECTED.</p>
+            <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"><!-- JS Populated --></div>
+            <div id="no-results" class="hidden text-center py-20 text-slate-500">
+                <i class="fa-solid fa-ghost text-4xl mb-3 animate-bounce"></i><p>No operatives found.</p>
             </div>
         </section>
     </main>
 
-    <div id="member-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-black/90 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
-        
-        <div class="pointer-events-none fixed inset-0 z-40 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
-
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0 relative z-50">
-            <div class="relative transform overflow-hidden bg-tacDark border border-tacAmber text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+    <!-- Detail Modal -->
+    <div id="member-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-card border border-slate-600 text-left shadow-2xl shadow-neonCyan/20 transition-all sm:my-8 sm:w-full sm:max-w-2xl animate-slide-up">
                 
-                <div class="flex justify-between items-center bg-tacPanel border-b border-tacGray px-4 py-2">
-                    <span class="text-xs text-tacAmber font-mono animate-pulse">:: SECURE CONNECTION ESTABLISHED ::</span>
-                    <button id="close-modal" class="text-tacGray hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button id="close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white z-20"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                
+                <!-- Action Buttons -->
+                <div id="modal-actions" class="absolute top-4 left-4 z-20 flex gap-2">
+                    <!-- Injected by JS -->
                 </div>
 
-                <div id="modal-actions" class="absolute top-14 right-6 z-20 flex gap-2"></div>
-
-                <div id="modal-content" class="bg-tacDark pb-6"></div>
-                
-                <div class="bg-black border-t border-tacGray p-2 flex justify-between text-[10px] text-tacGray font-mono uppercase">
-                    <span>SEC: ENCRYPTED</span>
-                    <span>LOC: UNKNOWN</span>
-                </div>
+                <div id="modal-content" class="bg-card pb-6"><!-- JS Populated --></div>
             </div>
         </div>
     </div>
 
+    <!-- Register/Edit Modal (With Custom Game Input) -->
     <div id="register-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="fixed inset-0 bg-black/95 backdrop-blur-sm" id="reg-backdrop"></div>
+        <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm" id="reg-backdrop"></div>
         <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative bg-tacPanel border border-tacGray w-full max-w-lg p-6 shadow-2xl">
-                <div class="absolute top-0 left-0 w-2 h-2 border-t border-l border-tacAmber"></div>
-                <div class="absolute top-0 right-0 w-2 h-2 border-t border-r border-tacAmber"></div>
-                <div class="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-tacAmber"></div>
-                <div class="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-tacAmber"></div>
-
-                <h2 id="modal-title" class="font-stencil text-2xl text-white mb-6 border-b border-tacGray pb-2">PROFILE INITIALIZATION</h2>
+            <div class="relative bg-card border border-neonCyan rounded-lg shadow-2xl shadow-neonCyan/20 w-full max-w-lg p-6 animate-slide-up">
+                <h2 id="modal-title" class="font-orbitron text-2xl text-white mb-6 border-b border-slate-700 pb-2">Initialize Profile</h2>
                 
-                <form id="register-form" class="space-y-4 font-mono">
+                <form id="register-form" class="space-y-4">
                     <input type="hidden" id="reg-id" value="">
 
+                    <!-- Name & Status -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs text-tacGray mb-1">CODENAME</label>
-                            <input type="text" id="reg-name" required class="w-full input-tac px-3 py-2 text-sm" placeholder="ENTER CALLSIGN">
+                            <label class="block text-xs text-slate-400 mb-1">Codename</label>
+                            <input type="text" id="reg-name" required class="w-full input-neon rounded px-3 py-2 text-sm" placeholder="Enter username">
                         </div>
                         <div>
-                            <label class="block text-xs text-tacGray mb-1">STATUS</label>
-                            <select id="reg-status" class="w-full input-tac px-3 py-2 text-sm cursor-pointer">
-                                <option value="Online">ONLINE</option>
-                                <option value="Looking for Group">REQ SUPPORT (LFG)</option>
-                                <option value="Solo Play">SOLO OP</option>
-                                <option value="In Game">MISSION ACTIVE</option>
+                            <label class="block text-xs text-slate-400 mb-1">Current Status</label>
+                            <select id="reg-status" class="w-full input-neon rounded px-3 py-2 text-sm cursor-pointer">
+                                <option value="Online">Online</option>
+                                <option value="Looking for Group">Looking for Group</option>
+                                <option value="Solo Play">Solo Play</option>
+                                <option value="In Game">In Game</option>
                             </select>
                         </div>
                     </div>
 
+                    <!-- Avatar Selection -->
                     <div>
-                        <label class="block text-xs text-tacGray mb-2">CLASS AVATAR</label>
-                        <div class="flex gap-4 justify-center bg-black/30 p-3 border border-tacGray">
+                        <label class="block text-xs text-slate-400 mb-2">Select Avatar</label>
+                        <div class="flex gap-4 justify-center bg-slate-800 p-3 rounded border border-slate-700">
                             <label class="cursor-pointer group">
                                 <input type="radio" name="avatar" value="fa-user-astronaut" checked class="hidden peer">
-                                <div class="w-10 h-10 border border-tacGray flex items-center justify-center peer-checked:bg-tacAmber peer-checked:text-black text-tacGray group-hover:border-tacAmber transition-all">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-neonCyan peer-checked:text-black text-slate-300 group-hover:bg-slate-600 transition-all">
                                     <i class="fa-solid fa-user-astronaut"></i>
                                 </div>
                             </label>
                             <label class="cursor-pointer group">
                                 <input type="radio" name="avatar" value="fa-dragon" class="hidden peer">
-                                <div class="w-10 h-10 border border-tacGray flex items-center justify-center peer-checked:bg-tacRed peer-checked:text-black text-tacGray group-hover:border-tacRed transition-all">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-neonPink peer-checked:text-white text-slate-300 group-hover:bg-slate-600 transition-all">
                                     <i class="fa-solid fa-dragon"></i>
                                 </div>
                             </label>
                             <label class="cursor-pointer group">
                                 <input type="radio" name="avatar" value="fa-robot" class="hidden peer">
-                                <div class="w-10 h-10 border border-tacGray flex items-center justify-center peer-checked:bg-tacGreen peer-checked:text-black text-tacGray group-hover:border-tacGreen transition-all">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-neonGreen peer-checked:text-black text-slate-300 group-hover:bg-slate-600 transition-all">
                                     <i class="fa-solid fa-robot"></i>
                                 </div>
                             </label>
                             <label class="cursor-pointer group">
                                 <input type="radio" name="avatar" value="fa-skull" class="hidden peer">
-                                <div class="w-10 h-10 border border-tacGray flex items-center justify-center peer-checked:bg-white peer-checked:text-black text-tacGray group-hover:border-white transition-all">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-red-500 peer-checked:text-white text-slate-300 group-hover:bg-slate-600 transition-all">
                                     <i class="fa-solid fa-skull"></i>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <div class="border-t border-tacGray pt-4 mt-2">
-                        <label class="block text-xs text-tacAmber mb-2 font-bold uppercase flex justify-between items-center">
-                            ASSIGNED MISSIONS
-                            <span class="text-[10px] text-tacGray normal-case font-normal">Add known or custom simulations</span>
+                    <!-- GAME PORTFOLIO MANAGEMENT -->
+                    <div class="border-t border-slate-700 pt-4 mt-2">
+                        <label class="block text-xs text-neonCyan mb-2 font-bold uppercase flex justify-between items-center">
+                            Active Games List
+                            <span class="text-[10px] text-slate-500 normal-case font-normal">Add known or custom games</span>
                         </label>
                         
-                        <div id="editor-game-list" class="space-y-2 mb-4 max-h-32 overflow-y-auto p-1 border border-tacGray bg-black/20">
-                            </div>
+                        <!-- List of added games -->
+                        <div id="editor-game-list" class="space-y-2 mb-4 max-h-32 overflow-y-auto p-1 custom-scroll">
+                            <!-- Populated by JS -->
+                        </div>
 
-                        <div class="bg-black/20 p-3 border border-tacGray animate-fade-in">
-                            <h4 class="text-xs text-white mb-2 font-bold flex items-center gap-2"><i class="fa-solid fa-plus-square text-tacGreen"></i> ADD PARAMETERS</h4>
+                        <!-- Add new game inputs -->
+                        <div class="bg-slate-800 p-3 rounded border border-slate-600 animate-fade-in">
+                            <h4 class="text-xs text-white mb-2 font-bold"><i class="fa-solid fa-plus-circle text-neonGreen mr-1"></i> Add Game Title</h4>
                             <div class="space-y-2">
+                                <!-- Replaced Select with Input + Datalist for Custom Games -->
                                 <div class="relative">
-                                    <input type="text" id="new-game-title" list="game-options" class="w-full input-tac px-2 py-1 text-xs mb-1 uppercase" placeholder="SELECT OR TYPE SIMULATION...">
-                                    <datalist id="game-options"></datalist>
+                                    <input type="text" id="new-game-title" list="game-options" class="w-full input-neon rounded px-2 py-1 text-xs mb-1" placeholder="Type or select game...">
+                                    <datalist id="game-options">
+                                        <!-- Options by JS -->
+                                    </datalist>
                                 </div>
 
                                 <div class="flex gap-2">
-                                    <input type="number" id="new-game-progress" placeholder="COMPLETION %" min="0" max="100" class="w-1/3 input-tac px-2 py-1 text-xs">
-                                    <input type="text" id="new-game-rank" placeholder="RANK/LEVEL" class="w-2/3 input-tac px-2 py-1 text-xs uppercase">
+                                    <input type="number" id="new-game-progress" placeholder="Progress %" min="0" max="100" class="w-1/3 input-neon rounded px-2 py-1 text-xs">
+                                    <input type="text" id="new-game-rank" placeholder="Rank (e.g. Gold)" class="w-2/3 input-neon rounded px-2 py-1 text-xs">
                                 </div>
-                                <button type="button" onclick="addGameToEditor()" class="w-full bg-tacGray hover:bg-white hover:text-black text-white text-xs py-1.5 transition-colors mt-2 font-bold font-stencil tracking-wider">
-                                    CONFIRM ENTRY
+                                <button type="button" onclick="addGameToEditor()" class="w-full bg-slate-700 hover:bg-neonGreen hover:text-black text-white text-xs py-1.5 rounded transition-colors mt-2 font-bold">
+                                    Add to List
                                 </button>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Actions -->
                     <div class="flex gap-3 pt-4">
-                        <button type="button" id="btn-cancel-reg" class="flex-1 border border-tacGray hover:bg-tacGray/20 text-tacGray py-2 text-sm transition-colors font-stencil">ABORT</button>
-                        <button type="submit" id="btn-submit-reg" class="flex-1 bg-tacAmber hover:bg-amber-400 text-black font-bold py-2 text-sm transition-colors font-stencil">EXECUTE</button>
+                        <button type="button" id="btn-cancel-reg" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded text-sm transition-colors">Cancel</button>
+                        <button type="submit" id="btn-submit-reg" class="flex-1 bg-neonCyan hover:bg-cyan-400 text-black font-bold py-2 rounded text-sm shadow-lg shadow-cyan-500/30 transition-colors">Initialize</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-8 right-8 bg-tacPanel border border-tacGreen text-tacGreen font-mono px-6 py-3 shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
-        <i class="fa-solid fa-terminal"></i> 
-        <div>
-            <div class="text-[10px] text-tacGray">SYSTEM MESSAGE</div>
-            <span id="toast-message" class="font-bold">OPERATION COMPLETE</span>
-        </div>
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-neonGreen text-black font-bold px-6 py-3 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-solid fa-check-circle mr-2"></i> <span id="toast-message">Action Complete</span>
     </div>
 
     <script>
         /**
-         * GCM TACTICAL OS v3.0 Logic
-         * Refitted for Kanagi Eiki
+         * GCM Nexus v2.4 Logic (Custom Game Input)
          */
 
         const gameDatabase = {
-            'Apex Legends': { icon: 'fa-crosshairs', description: "High-velocity squad based combat simulation.", objective: "SURVIVE UNTIL EXTRACTION.", appeal: "Tactical ability synergy required." },
-            'Valorant': { icon: 'fa-bullseye', description: "5v5 Tactical Shooter simulation.", objective: "PLANT/DEFUSE SPIKE.", appeal: "Precision aim and utility usage." },
-            'Elden Ring': { icon: 'fa-ring', description: "Open World Hostile Environment simulation.", objective: "ESTABLISH ORDER.", appeal: "High threat level entities." },
-            'League of Legends': { icon: 'fa-shield-halved', description: "Multiplayer Online Battle Arena.", objective: "DESTROY ENEMY NEXUS.", appeal: "Macro strategy execution." },
-            'Minecraft': { icon: 'fa-cube', description: "Voxel-based resource gathering and construction.", objective: "SURVIVAL/CREATIVE.", appeal: "Infinite tactical flexibility." },
-            'Street Fighter 6': { icon: 'fa-hand-fist', description: "Close Quarters Combat (CQC) simulation.", objective: "NEUTRALIZE OPPONENT.", appeal: "Frame-perfect execution." },
-            'Escape from Tarkov': { icon: 'fa-person-military-rifle', description: "Hardcore extraction shooter.", objective: "LOOT AND EXTRACT.", appeal: "Extreme risk/reward ratio." },
-            'Monster Hunter': { icon: 'fa-paw', description: "Large scale biological threat neutralization.", objective: "HUNT/CAPTURE TARGET.", appeal: "Equipment crafting and co-op." }
+            'Apex Legends': { icon: 'fa-crosshairs', description: "部隊連携が鍵となるハイスピードなバトルロイヤルFPS。", objective: "最後の1部隊（チャンピオン）になるまで生き残ること。", appeal: "キャラクターごとの固有アビリティとスピード感あふれる戦闘が魅力。" },
+            'Valorant': { icon: 'fa-bullseye', description: "5vs5のタクティカルシューター。精密な射撃とスキルが求められる。", objective: "スパイクの設置/解除、または敵チームの殲滅。", appeal: "戦略的なアビリティ活用と、競技性の高い緊張感。" },
+            'Elden Ring': { icon: 'fa-ring', description: "広大なオープンワールドを探索するダークファンタジーアクションRPG。", objective: "狭間の地を冒険し、エルデの王となる。", appeal: "圧倒的な自由度と、手強いボスを倒した時の達成感。" },
+            'League of Legends': { icon: 'fa-shield-halved', description: "100体以上のチャンピオンを操作し、拠点を破壊しあうMOBAの金字塔。", objective: "敵チームのネクサス（本拠地）を破壊する。", appeal: "チームワーク、戦略、個人のプレイスキルが複雑に絡み合う奥深さ。" },
+            'Minecraft': { icon: 'fa-cube', description: "ブロックで構成された世界で、建築や冒険を自由に楽しめるサンドボックス。", objective: "明確な目的はなく、建築、サバイバル、レッドストーン回路など無限大。", appeal: "想像力をそのまま形にできる創造性と自由度。" },
+            'Street Fighter 6': { icon: 'fa-hand-fist', description: "格闘ゲームの金字塔。モダン操作で初心者も参入しやすい。", objective: "相手の体力を0にしてKOする。", appeal: "読み合いの熱さと、自身の成長を実感できる対人戦の醍醐味。" },
+            'Escape from Tarkov': { icon: 'fa-person-military-rifle', description: "極めてハードコアなFPS。倒されると装備を全ロストする緊張感。", objective: "物資を集め、マップから生きて脱出する。", appeal: "他に類を見ないリアリティと、ハイリスク・ハイリターンの興奮。" },
+            'Monster Hunter': { icon: 'fa-paw', description: "巨大なモンスターを狩猟し、装備を強化していくハンティングアクション。", objective: "クエストを受注し、指定されたモンスターを狩猟・捕獲する。", appeal: "仲間との連携プレイと、素材を集めて装備を作るコレクション性。" }
         };
-
-        const defaultGameInfo = { icon: 'fa-gamepad', description: "Unregistered simulation parameter.", objective: "NO DATA.", appeal: "N/A" };
+        // Default info for custom games
+        const defaultGameInfo = { icon: 'fa-gamepad', description: "Custom game added by user.", objective: "No database info.", appeal: "Check profile for details." };
 
         // Data Management
         const generateDummyData = () => {
             const gameKeys = Object.keys(gameDatabase);
             const statuses = ['Online', 'In Game', 'Looking for Group', 'Offline'];
-            // Updated Colors for Tactical Theme (Text based)
             const users = [
-                { name: "NeonSamurai", avatar: "fa-user-ninja", color: "text-tacAmber" },
-                { name: "PixelPanda", avatar: "fa-robot", color: "text-tacCyan" },
-                { name: "SniperWolf", avatar: "fa-user-secret", color: "text-tacGray" },
-                { name: "HealerMain", avatar: "fa-user-nurse", color: "text-tacGreen" }
+                { name: "NeonSamurai", avatar: "fa-user-ninja", color: "text-neonPink" },
+                { name: "PixelPanda", avatar: "fa-robot", color: "text-neonCyan" },
+                { name: "SniperWolf", avatar: "fa-user-secret", color: "text-slate-300" },
+                { name: "HealerMain", avatar: "fa-user-nurse", color: "text-neonGreen" }
             ];
 
             return users.map((u, index) => {
@@ -376,7 +332,7 @@
                     return {
                         title: title,
                         progress: Math.floor(Math.random() * 100) + 1,
-                        rank: ['GOLD', 'PLAT', 'DIAMOND', 'ELITE'][Math.floor(Math.random() * 4)]
+                        rank: ['Gold', 'Plat', 'Diamond'][Math.floor(Math.random() * 3)]
                     };
                 }).filter((v,i,a) => a.findIndex(t => t.title === v.title) === i);
 
@@ -385,28 +341,29 @@
                     name: u.name,
                     avatar: u.avatar,
                     avatarColor: u.color,
-                    genres: ['OPERATIVE'],
+                    genres: ['Gamer'],
                     games: userGames,
                     status: statuses[Math.floor(Math.random() * statuses.length)],
+                    lastSeen: '2h ago'
                 };
             });
         };
 
         let members = generateDummyData();
         let currentFilter = { text: '', status: 'all' };
+        
         let tempEditorGames = [];
 
-        // UI Helpers - TACTICAL BADGES
+        // UI Helpers
         const getStatusBadge = (status) => {
-            const styles = {
-                'Online': 'border-tacGreen text-tacGreen shadow-[0_0_5px_rgba(16,185,129,0.3)]',
-                'In Game': 'border-tacCyan text-tacCyan',
-                'Looking for Group': 'border-tacAmber text-tacAmber animate-pulse bg-tacAmber/10',
-                'Solo Play': 'border-purple-400 text-purple-400',
-                'Offline': 'border-tacGray text-tacGray'
+            const colors = {
+                'Online': 'bg-green-500/20 text-green-400 border-green-500/50',
+                'In Game': 'bg-blue-500/20 text-blue-400 border-blue-500/50',
+                'Looking for Group': 'bg-neonPink/20 text-neonPink border-neonPink/50 animate-pulse',
+                'Solo Play': 'bg-purple-500/20 text-purple-400 border-purple-500/50',
+                'Offline': 'bg-slate-700/50 text-slate-400 border-slate-600'
             };
-            const style = styles[status] || styles['Offline'];
-            return `<span class="px-2 py-0.5 text-[10px] font-mono border ${style} tracking-widest uppercase">${status}</span>`;
+            return `<span class="px-2 py-0.5 rounded text-xs border ${colors[status] || colors['Offline']} font-medium tracking-wide">${status}</span>`;
         };
 
         const renderDashboard = () => {
@@ -422,22 +379,22 @@
             document.getElementById('game-stats-container').innerHTML = Object.entries(gameCounts)
                 .sort((a, b) => b[1] - a[1]).slice(0, 5)
                 .map(([game, count]) => `
-                    <div class="group border-l-2 border-tacGray pl-3 hover:border-tacAmber transition-colors">
-                        <div class="flex justify-between text-xs font-mono mb-1 uppercase">
-                            <span class="text-white group-hover:text-tacAmber transition-colors">${game}</span>
-                            <span class="text-tacGray">[${count}]</span>
+                    <div class="group">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-slate-300">${game}</span>
+                            <span class="text-slate-500">${count}</span>
                         </div>
-                        <div class="w-full bg-tacDark h-1.5 border border-tacGray/30">
-                            <div class="bg-tacGray group-hover:bg-tacAmber h-full" style="width: ${(count/members.length)*100}%"></div>
+                        <div class="w-full bg-slate-800 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-cyan-600 to-blue-500 h-2 rounded-full" style="width: ${(count/members.length)*100}%"></div>
                         </div>
                     </div>`).join('');
-
+            
             const genreCounts = {};
             members.forEach(m => m.genres.forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1));
             document.getElementById('genre-stats-container').innerHTML = Object.entries(genreCounts)
                 .sort((a,b)=>b[1]-a[1]).map(([g, c]) => `
-                    <span class="px-2 py-1 bg-tacPanel border border-tacGray text-[10px] text-tacGray font-mono uppercase">
-                        ${g} <span class="text-white ml-1">:: ${c}</span>
+                    <span class="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs text-slate-300">
+                        ${g} <span class="text-neonCyan ml-1">${c}</span>
                     </span>`).join('');
         };
 
@@ -460,33 +417,33 @@
             }
 
             filtered.forEach(member => {
-                const mainGame = member.games[0] || { title: 'IDLE', rank: 'N/A' };
+                const mainGame = member.games[0] || { title: 'No Games', rank: '-' };
                 const gameInfo = gameDatabase[mainGame.title] || defaultGameInfo;
 
                 const card = document.createElement('div');
-                card.className = 'card-tac p-5 cursor-pointer group animate-fade-in';
+                card.className = 'bg-card border border-slate-700 rounded-xl p-5 card-hover relative group cursor-pointer overflow-hidden animate-fade-in';
                 card.onclick = () => openModal(member.id);
 
                 card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-slate-600 to-transparent group-hover:via-neonCyan transition-all"></div>
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-tacDark border border-tacGray flex items-center justify-center text-2xl ${member.avatarColor || 'text-white'} relative">
-                                <i class="fa-solid ${member.avatar} z-10"></i>
-                                <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center text-2xl border border-slate-600 ${member.avatarColor || 'text-white'}">
+                                <i class="fa-solid ${member.avatar}"></i>
                             </div>
                             <div>
-                                <h3 class="font-stencil text-white text-lg leading-tight tracking-wide group-hover:text-tacAmber transition-colors">${member.name}</h3>
-                                <div class="text-[10px] text-tacGray mt-1 font-mono uppercase">ASSIGNED: ${member.games.length} SIMS</div>
+                                <h3 class="font-bold text-white text-lg leading-tight group-hover:text-neonCyan transition-colors">${member.name}</h3>
+                                <div class="text-xs text-slate-400 mt-1">${member.games.length} Active Games</div>
                             </div>
                         </div>
                         ${getStatusBadge(member.status)}
                     </div>
-                    <div class="bg-black/40 p-2 border border-tacGray/30 text-xs">
-                        <div class="flex justify-between text-tacGray mb-1 font-mono">
-                            <span>RANK: ${mainGame.rank}</span>
+                    <div class="bg-slate-800/50 rounded p-2 border border-slate-700/50">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <span>Main: ${mainGame.rank}</span>
                         </div>
-                        <div class="text-sm font-bold text-gray-300 truncate font-mono uppercase">
-                            <i class="fa-solid ${gameInfo.icon} mr-1 text-tacGray"></i> ${mainGame.title}
+                        <div class="text-sm font-medium text-slate-200 truncate">
+                            <i class="fa-solid ${gameInfo.icon} mr-1 text-slate-500"></i> ${mainGame.title}
                         </div>
                     </div>
                 `;
@@ -501,10 +458,10 @@
 
             const actionsDiv = document.getElementById('modal-actions');
             actionsDiv.innerHTML = `
-                <button onclick="openRegisterModal(${member.id})" class="bg-tacPanel hover:bg-white hover:text-black text-white text-[10px] px-3 py-1.5 border border-tacGray transition-all flex items-center gap-1 font-mono uppercase">
-                    <i class="fa-solid fa-pen"></i> EDIT
+                <button onclick="openRegisterModal(${member.id})" class="bg-slate-800/80 hover:bg-neonCyan/20 hover:text-neonCyan text-slate-300 text-xs px-3 py-1.5 rounded border border-slate-600 backdrop-blur transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-pen"></i> Edit Profile
                 </button>
-                <button onclick="deleteMember(${member.id})" class="bg-tacPanel hover:bg-tacRed hover:text-white text-tacRed text-[10px] px-3 py-1.5 border border-tacRed/50 transition-all flex items-center gap-1 font-mono uppercase">
+                <button onclick="deleteMember(${member.id})" class="bg-slate-800/80 hover:bg-danger/20 hover:text-danger text-slate-300 text-xs px-3 py-1.5 rounded border border-slate-600 backdrop-blur transition-all flex items-center gap-1">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             `;
@@ -512,27 +469,31 @@
             const gamesHtml = member.games.map(g => {
                 const info = gameDatabase[g.title] || defaultGameInfo;
                 return `
-                <div class="bg-tacPanel border border-tacGray mb-3 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 p-1 opacity-10 text-4xl"><i class="fa-solid ${info.icon}"></i></div>
-                    <div class="p-3 flex items-center gap-4 border-b border-tacGray/30 relative z-10">
-                        <div class="w-8 h-8 bg-tacDark border border-tacGray flex items-center justify-center text-lg text-tacGray">
+                <div class="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden mb-3">
+                    <div class="p-3 flex items-center gap-4 border-b border-slate-700/50">
+                        <div class="w-10 h-10 rounded bg-slate-700 flex items-center justify-center text-xl text-slate-300">
                             <i class="fa-solid ${info.icon}"></i>
                         </div>
                         <div class="flex-grow">
                             <div class="flex justify-between mb-1">
-                                <span class="font-bold text-sm text-white font-mono uppercase">${g.title}</span>
-                                <span class="text-[10px] text-tacAmber border border-tacAmber/30 px-1 font-mono">${g.rank}</span>
+                                <span class="font-bold text-sm text-white">${g.title}</span>
+                                <span class="text-xs text-neonCyan border border-neonCyan/30 px-1 rounded">${g.rank}</span>
                             </div>
-                            <div class="w-full bg-tacDark h-1">
-                                <div class="bg-tacGray h-1" style="width: ${g.progress}%"></div>
+                            <div class="w-full bg-slate-900 h-1.5 rounded-full">
+                                <div class="bg-gradient-to-r from-neonPink to-purple-500 h-1.5 rounded-full" style="width: ${g.progress}%"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="p-3 bg-black/20 text-xs font-mono">
+                    <div class="p-3 bg-slate-900/50 text-sm">
                         <div class="grid grid-cols-1 gap-2">
                             <div>
-                                <span class="text-[10px] uppercase text-tacGray font-bold tracking-wider">:: MISSION OBJECTIVE</span>
-                                <p class="text-gray-400 mt-0.5">${info.objective}</p>
+                                <span class="text-[10px] uppercase text-slate-500 font-bold tracking-wider">概要・目的</span>
+                                <p class="text-slate-300 text-xs mt-0.5">${info.description}</p>
+                                <p class="text-slate-400 text-xs mt-1 italic"><i class="fa-solid fa-flag-checkered text-neonYellow mr-1"></i> ${info.objective}</p>
+                            </div>
+                            <div class="mt-1 pt-2 border-t border-slate-700/50">
+                                <span class="text-[10px] uppercase text-neonPink font-bold tracking-wider">Appeal Point</span>
+                                <p class="text-slate-200 text-xs mt-0.5"><i class="fa-solid fa-star text-neonPink mr-1"></i> ${info.appeal}</p>
                             </div>
                         </div>
                     </div>
@@ -540,21 +501,22 @@
             }).join('');
 
             document.getElementById('modal-content').innerHTML = `
-                <div class="h-20 bg-tacPanel border-b border-tacGray relative bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+                <div class="h-24 bg-gradient-to-r from-slate-800 to-indigo-900 relative">
                     <div class="absolute -bottom-8 left-6">
-                        <div class="w-20 h-20 bg-tacDark flex items-center justify-center text-4xl border border-tacAmber text-white shadow-lg">
+                        <div class="w-20 h-20 rounded-xl bg-slate-800 flex items-center justify-center text-4xl border-4 border-card ${member.avatarColor || 'text-white'} shadow-lg">
                             <i class="fa-solid ${member.avatar}"></i>
                         </div>
                     </div>
                     <div class="absolute top-4 right-4">${getStatusBadge(member.status)}</div>
                 </div>
-                <div class="px-6 pt-10 text-left">
-                    <h2 class="text-3xl font-stencil text-white tracking-wider">${member.name}</h2>
-                    <p class="text-tacGray text-xs font-mono mb-6">OPERATIVE ID: #000${member.id}</p>
-                    
-                    <h3 class="text-xs uppercase tracking-widest text-tacAmber font-bold mb-3 border-b border-tacGray pb-1">:: MISSION PORTFOLIO</h3>
-                    <div class="max-h-80 overflow-y-auto pr-2 custom-scroll">
-                        ${gamesHtml.length ? gamesHtml : '<p class="text-tacGray text-xs font-mono italic">NO ACTIVE MISSIONS ASSIGNED.</p>'}
+                <div class="px-6 pt-10">
+                    <h2 class="text-2xl font-bold text-white font-orbitron">${member.name}</h2>
+                    <p class="text-slate-400 text-sm mt-1">ID: #000${member.id}</p>
+                    <div class="mt-6">
+                        <h3 class="text-sm uppercase tracking-wider text-slate-500 font-bold mb-3">Game Portfolio</h3>
+                        <div class="max-h-80 overflow-y-auto pr-2 custom-scroll">
+                            ${gamesHtml.length ? gamesHtml : '<p class="text-slate-500 text-sm italic">No active games listed.</p>'}
+                        </div>
                     </div>
                 </div>
             `;
@@ -562,14 +524,15 @@
         };
 
         const deleteMember = (id) => {
-            if(confirm("CONFIRM DELETION OF OPERATIVE DATA?")) {
+            if(confirm("Are you sure you want to delete this operative?")) {
                 members = members.filter(m => m.id !== id);
                 document.getElementById('member-modal').classList.add('hidden');
                 renderDashboard();
                 renderMembers();
-                showToast("OPERATIVE DATA PURGED", "border-tacRed text-tacRed");
+                showToast("Operative Deleted", "bg-red-500");
             }
         };
+
         const closeModal = (id) => { document.getElementById(id).classList.add('hidden'); };
 
         // --- Register/Edit Modal Logic ---
@@ -586,8 +549,8 @@
             const isEdit = id !== null;
             document.getElementById('member-modal').classList.add('hidden');
             
-            document.getElementById('modal-title').textContent = isEdit ? "UPDATE PROFILE" : "PROFILE INITIALIZATION";
-            document.getElementById('btn-submit-reg').textContent = isEdit ? "UPDATE DATA" : "INITIALIZE";
+            document.getElementById('modal-title').textContent = isEdit ? "Update Profile" : "Initialize Profile";
+            document.getElementById('btn-submit-reg').textContent = isEdit ? "Save Changes" : "Initialize";
             document.getElementById('reg-id').value = isEdit ? id : "";
 
             if (isEdit) {
@@ -596,6 +559,8 @@
                 document.getElementById('reg-status').value = m.status;
                 const radios = document.getElementsByName('avatar');
                 for(let r of radios) { r.checked = (r.value === m.avatar); }
+                
+                // Deep Copy games
                 tempEditorGames = JSON.parse(JSON.stringify(m.games));
             } else {
                 regForm.reset();
@@ -606,38 +571,48 @@
             regModal.classList.remove('hidden');
         };
 
+        // Editor Game List Methods
         window.renderEditorGames = () => {
             if(tempEditorGames.length === 0) {
-                editorList.innerHTML = `<div class="text-center text-[10px] text-tacGray py-2 font-mono">NO MISSIONS ASSIGNED</div>`;
+                editorList.innerHTML = `<div class="text-center text-xs text-slate-500 py-2 border border-dashed border-slate-700 rounded">No games added. Add one below.</div>`;
                 return;
             }
             editorList.innerHTML = tempEditorGames.map((g, idx) => `
-                <div class="flex items-center justify-between bg-black/40 p-2 border-b border-tacGray/30 last:border-0">
+                <div class="flex items-center justify-between bg-slate-900/50 p-2 rounded border border-slate-700/50">
                     <div class="flex items-center gap-2 overflow-hidden">
-                        <i class="fa-solid ${gameDatabase[g.title]?.icon || 'fa-gamepad'} text-tacGray text-xs"></i>
+                        <i class="fa-solid ${gameDatabase[g.title]?.icon || 'fa-gamepad'} text-slate-400"></i>
                         <div class="flex flex-col">
-                            <span class="text-xs text-white font-bold truncate w-32 font-mono uppercase">${g.title}</span>
-                            <span class="text-[10px] text-tacGray font-mono">RANK: ${g.rank} | ${g.progress}%</span>
+                            <span class="text-xs text-white font-bold truncate w-24">${g.title}</span>
+                            <span class="text-[10px] text-slate-400">Rank: ${g.rank} | ${g.progress}%</span>
                         </div>
                     </div>
-                    <button type="button" onclick="deleteGameFromEditor(${idx})" class="text-tacGray hover:text-tacRed transition-colors p-1">
-                        <i class="fa-solid fa-times"></i>
+                    <button type="button" onclick="deleteGameFromEditor(${idx})" class="text-slate-500 hover:text-red-400 transition-colors p-1">
+                        <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
             `).join('');
         };
 
         window.addGameToEditor = () => {
-            const title = gameInput.value.trim();
+            const title = gameInput.value.trim(); // Get value from input, not select
             const progress = document.getElementById('new-game-progress').value || 0;
-            const rank = document.getElementById('new-game-rank').value || 'ROOKIE';
+            const rank = document.getElementById('new-game-rank').value || 'Beginner';
 
-            if (!title) { showToast("INPUT ERROR: TITLE REQUIRED", "border-tacAmber text-tacAmber"); return; }
-            if(tempEditorGames.some(g => g.title.toLowerCase() === title.toLowerCase())) {
-                showToast("ERROR: DUPLICATE ENTRY", "border-tacAmber text-tacAmber"); return;
+            if (!title) {
+                showToast("Please enter a game title!", "bg-neonYellow");
+                return;
             }
+
+            // Check duplicate
+            if(tempEditorGames.some(g => g.title.toLowerCase() === title.toLowerCase())) {
+                showToast("Game already in list!", "bg-neonYellow");
+                return;
+            }
+
             tempEditorGames.push({ title, progress, rank });
             renderEditorGames();
+            
+            // Clear inputs
             gameInput.value = '';
             document.getElementById('new-game-progress').value = '';
             document.getElementById('new-game-rank').value = '';
@@ -658,36 +633,36 @@
             const name = document.getElementById('reg-name').value;
             const status = document.getElementById('reg-status').value;
             const avatar = document.querySelector('input[name="avatar"]:checked').value;
-            
+
             if (idVal) {
+                // UPDATE
                 const idx = members.findIndex(m => m.id == idVal);
                 if(idx !== -1) {
                     members[idx] = { ...members[idx], name, status, avatar, games: tempEditorGames };
-                    showToast("PROFILE UPDATED", "border-tacCyan text-tacCyan");
+                    showToast("Profile Updated");
                 }
             } else {
+                // CREATE
                 const newMember = {
                     id: Date.now(),
                     name, status, avatar,
                     avatarColor: 'text-white',
-                    genres: ['OPERATIVE'],
+                    genres: ['Gamer'],
                     games: tempEditorGames,
+                    lastSeen: 'Just now'
                 };
                 members.unshift(newMember);
-                showToast("NEW OPERATIVE INITIALIZED");
+                showToast("Welcome to Nexus!");
             }
             regModal.classList.add('hidden');
             renderDashboard();
             renderMembers();
         };
 
-        const showToast = (msg, styleClass = "border-tacGreen text-tacGreen") => {
+        const showToast = (msg, bgClass = "bg-neonGreen") => {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').textContent = msg;
-            
-            // Remove old classes and add base + new style
-            toast.className = `fixed bottom-8 right-8 bg-black/90 px-6 py-3 shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 border font-mono uppercase ${styleClass}`;
-            
+            toast.className = `fixed bottom-4 right-4 ${bgClass} text-black font-bold px-6 py-3 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50`;
             requestAnimationFrame(() => toast.classList.remove('opacity-0', 'translate-y-20'));
             setTimeout(() => toast.classList.add('opacity-0', 'translate-y-20'), 3000);
         };
@@ -695,6 +670,7 @@
         // Global Listeners
         document.getElementById('close-modal').onclick = () => closeModal('member-modal');
         document.getElementById('modal-backdrop').onclick = () => closeModal('member-modal');
+        
         document.getElementById('search-input').addEventListener('input', (e) => {
             currentFilter.text = e.target.value.toLowerCase();
             renderMembers();

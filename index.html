@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCM Nexus v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        card: '#1e293b',
+                        neonCyan: '#06b6d4',
+                        neonPink: '#d946ef',
+                        neonGreen: '#22c55e',
+                        neonYellow: '#eab308'
+                    },
+                    fontFamily: {
+                        headers: ['Orbitron', 'sans-serif'],
+                        body: ['Roboto', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.3); border-color: #06b6d4; }
+        
+        /* Form Elements */
+        .input-neon {
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            color: white;
+            transition: all 0.2s;
+        }
+        .input-neon:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <nav class="bg-card border-b border-slate-700 sticky top-0 z-40 shadow-lg bg-opacity-95 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-gamepad text-neonCyan text-2xl animate-pulse"></i>
+                    <span class="font-orbitron text-xl font-bold tracking-wider text-white cursor-pointer" onclick="location.reload()">GCM <span class="text-neonPink">NEXUS</span></span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex space-x-4">
+                        <div class="bg-slate-800 px-3 py-1 rounded-full text-xs text-slate-400 border border-slate-700">
+                            <span class="w-2 h-2 rounded-full bg-neonGreen inline-block mr-1"></span>
+                            Online: <span id="stat-online-count" class="text-white font-bold">0</span>
+                        </div>
+                    </div>
+                    <button id="btn-open-register" class="bg-gradient-to-r from-neonCyan to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-2 px-4 rounded shadow-lg shadow-cyan-500/30 transition-all transform hover:scale-105 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Join Nexus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8 animate-fade-in">
+        
+        <section id="dashboard" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-card rounded-xl p-6 border border-slate-700 shadow-lg lg:col-span-2 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-trophy text-9xl"></i></div>
+                <h2 class="font-orbitron text-lg text-neonCyan mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-simple"></i> Trending Games
+                </h2>
+                <div id="game-stats-container" class="space-y-4"></div>
+            </div>
+
+            <div class="bg-card rounded-xl p-6 border border-slate-700 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-chart-pie text-9xl"></i></div>
+                <h2 class="font-orbitron text-lg text-neonPink mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-tags"></i> Genre Preference
+                </h2>
+                <div id="genre-stats-container" class="flex flex-wrap gap-2"></div>
+                <div class="mt-8 bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <h3 class="text-xs text-slate-400 uppercase tracking-widest mb-2">Community Status</h3>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm">Recruiting (LFG)</span>
+                        <span id="lfg-percentage" class="text-sm font-bold text-neonGreen">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 rounded-full h-2">
+                        <div id="lfg-bar" class="bg-neonGreen h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="members">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h2 class="font-orbitron text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-users-viewfinder text-neonCyan"></i> Operatives
+                </h2>
+                <div class="flex flex-wrap gap-3 w-full md:w-auto bg-card p-2 rounded-lg border border-slate-700">
+                    <div class="relative flex-grow md:flex-grow-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
+                        <input type="text" id="search-input" placeholder="Search name or game..." 
+                            class="bg-slate-800 text-white text-sm rounded-md pl-9 pr-3 py-2 border border-slate-600 focus:outline-none focus:border-neonCyan w-full md:w-48">
+                    </div>
+                    <select id="status-filter" class="bg-slate-800 text-white text-sm rounded-md px-3 py-2 border border-slate-600 focus:outline-none focus:border-neonCyan cursor-pointer">
+                        <option value="all">All Status</option>
+                        <option value="Looking for Group">LFG</option>
+                        <option value="Online">Online</option>
+                        <option value="In Game">In Game</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+            <div id="no-results" class="hidden text-center py-20 text-slate-500">
+                <i class="fa-solid fa-ghost text-4xl mb-3 animate-bounce"></i><p>No operatives found.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="member-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-card border border-slate-600 text-left shadow-2xl shadow-neonCyan/20 transition-all sm:my-8 sm:w-full sm:max-w-2xl animate-slide-up">
+                <button id="close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white z-10"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                <div id="modal-content" class="bg-card pb-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="register-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm" id="reg-backdrop"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative bg-card border border-neonCyan rounded-lg shadow-2xl shadow-neonCyan/20 w-full max-w-lg p-6 animate-slide-up">
+                <h2 class="font-orbitron text-2xl text-white mb-6 border-b border-slate-700 pb-2">Initialize Profile</h2>
+                
+                <form id="register-form" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Codename</label>
+                            <input type="text" id="reg-name" required class="w-full input-neon rounded px-3 py-2 text-sm" placeholder="Enter username">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Current Status</label>
+                            <select id="reg-status" class="w-full input-neon rounded px-3 py-2 text-sm cursor-pointer">
+                                <option value="Online">Online</option>
+                                <option value="Looking for Group">Looking for Group</option>
+                                <option value="Solo Play">Solo Play</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-2">Select Avatar</label>
+                        <div class="flex gap-4 justify-center bg-slate-800 p-3 rounded border border-slate-700">
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="avatar" value="fa-user-astronaut" checked class="hidden peer">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-neonCyan peer-checked:text-black text-slate-300 group-hover:bg-slate-600 transition-all">
+                                    <i class="fa-solid fa-user-astronaut"></i>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="avatar" value="fa-dragon" class="hidden peer">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-neonPink peer-checked:text-white text-slate-300 group-hover:bg-slate-600 transition-all">
+                                    <i class="fa-solid fa-dragon"></i>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="avatar" value="fa-robot" class="hidden peer">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-neonGreen peer-checked:text-black text-slate-300 group-hover:bg-slate-600 transition-all">
+                                    <i class="fa-solid fa-robot"></i>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="avatar" value="fa-skull" class="hidden peer">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center peer-checked:bg-red-500 peer-checked:text-white text-slate-300 group-hover:bg-slate-600 transition-all">
+                                    <i class="fa-solid fa-skull"></i>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-700 pt-4 mt-2">
+                        <label class="block text-xs text-neonCyan mb-2 font-bold uppercase">Main Game Data</label>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Game Title</label>
+                                <select id="reg-game" class="w-full input-neon rounded px-3 py-2 text-sm cursor-pointer">
+                                    </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Progress (%)</label>
+                                    <input type="number" id="reg-progress" min="0" max="100" value="50" class="w-full input-neon rounded px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Rank / Level</label>
+                                    <input type="text" id="reg-rank" placeholder="e.g. Gold IV" class="w-full input-neon rounded px-3 py-2 text-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" id="btn-cancel-reg" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded text-sm transition-colors">Cancel</button>
+                        <button type="submit" class="flex-1 bg-neonCyan hover:bg-cyan-400 text-black font-bold py-2 rounded text-sm shadow-lg shadow-cyan-500/30 transition-colors">Initialize</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-neonGreen text-black font-bold px-6 py-3 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-solid fa-check-circle mr-2"></i> Registration Complete
+    </div>
+
+    <script>
+        /**
+         * GCM Nexus v2.0 Logic
+         */
+
+        // --- 1. GAME INTEL DATABASE (Static Data for Demo) ---
+        const gameDatabase = {
+            'Apex Legends': {
+                icon: 'fa-crosshairs',
+                description: "部隊連携が鍵となるハイスピードなバトルロイヤルFPS。",
+                objective: "最後の1部隊（チャンピオン）になるまで生き残ること。",
+                appeal: "キャラクターごとの固有アビリティとスピード感あふれる戦闘が魅力。"
+            },
+            'Valorant': {
+                icon: 'fa-bullseye',
+                description: "5vs5のタクティカルシューター。精密な射撃とスキルが求められる。",
+                objective: "スパイクの設置/解除、または敵チームの殲滅。",
+                appeal: "戦略的なアビリティ活用と、競技性の高い緊張感。"
+            },
+            'Elden Ring': {
+                icon: 'fa-ring',
+                description: "広大なオープンワールドを探索するダークファンタジーアクションRPG。",
+                objective: "狭間の地を冒険し、エルデの王となる。",
+                appeal: "圧倒的な自由度と、手強いボスを倒した時の達成感。"
+            },
+            'League of Legends': {
+                icon: 'fa-shield-halved',
+                description: "100体以上のチャンピオンを操作し、拠点を破壊しあうMOBAの金字塔。",
+                objective: "敵チームのネクサス（本拠地）を破壊する。",
+                appeal: "チームワーク、戦略、個人のプレイスキルが複雑に絡み合う奥深さ。"
+            },
+            'Minecraft': {
+                icon: 'fa-cube',
+                description: "ブロックで構成された世界で、建築や冒険を自由に楽しめるサンドボックス。",
+                objective: "明確な目的はなく、建築、サバイバル、レッドストーン回路など無限大。",
+                appeal: "想像力をそのまま形にできる創造性と自由度。"
+            },
+            'Street Fighter 6': {
+                icon: 'fa-hand-fist',
+                description: "格闘ゲームの金字塔。モダン操作で初心者も参入しやすい。",
+                objective: "相手の体力を0にしてKOする。",
+                appeal: "読み合いの熱さと、自身の成長を実感できる対人戦の醍醐味。"
+            },
+            'Escape from Tarkov': {
+                icon: 'fa-person-military-rifle',
+                description: "極めてハードコアなFPS。倒されると装備を全ロストする緊張感。",
+                objective: "物資を集め、マップから生きて脱出する。",
+                appeal: "他に類を見ないリアリティと、ハイリスク・ハイリターンの興奮。"
+            },
+            'Monster Hunter': {
+                icon: 'fa-paw',
+                description: "巨大なモンスターを狩猟し、装備を強化していくハンティングアクション。",
+                objective: "クエストを受注し、指定されたモンスターを狩猟・捕獲する。",
+                appeal: "仲間との連携プレイと、素材を集めて装備を作るコレクション性。"
+            }
+        };
+
+        // Fallback for custom games
+        const defaultGameInfo = {
+            icon: 'fa-gamepad',
+            description: "No database info available for this title.",
+            objective: "Complete the game objectives.",
+            appeal: "Check user profile for details."
+        };
+
+        // --- 2. DATA MANAGEMENT ---
+        const generateDummyData = () => {
+            const gameKeys = Object.keys(gameDatabase);
+            const statuses = ['Online', 'In Game', 'Looking for Group', 'Offline'];
+            
+            const users = [
+                { name: "NeonSamurai", avatar: "fa-user-ninja", color: "text-neonPink" },
+                { name: "PixelPanda", avatar: "fa-robot", color: "text-neonCyan" },
+                { name: "SniperWolf", avatar: "fa-user-secret", color: "text-slate-300" },
+                { name: "HealerMain", avatar: "fa-user-nurse", color: "text-neonGreen" },
+                { name: "TankDempsey", avatar: "fa-user-shield", color: "text-neonYellow" },
+                { name: "SpeedRunner", avatar: "fa-bolt", color: "text-orange-400" },
+                { name: "LoreMaster", avatar: "fa-book-skull", color: "text-purple-400" },
+                { name: "BuilderBob", avatar: "fa-hammer", color: "text-yellow-600" }
+            ];
+
+            return users.map((u, index) => {
+                // Randomly assign games
+                const userGames = Array.from({length: Math.floor(Math.random() * 2) + 1}, () => {
+                    const title = gameKeys[Math.floor(Math.random() * gameKeys.length)];
+                    return {
+                        title: title,
+                        progress: Math.floor(Math.random() * 100) + 1,
+                        rank: ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'][Math.floor(Math.random() * 5)]
+                    };
+                }).filter((v,i,a) => a.findIndex(t => t.title === v.title) === i);
+
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                
+                // Derive genres from games logic (Simplified for demo)
+                const genres = ['FPS', 'RPG', 'MOBA'].filter(() => Math.random() > 0.5);
+                if(genres.length === 0) genres.push('Casual');
+
+                return {
+                    id: index + 1,
+                    name: u.name,
+                    avatar: u.avatar,
+                    avatarColor: u.color,
+                    genres: genres,
+                    games: userGames,
+                    status: status,
+                    lastSeen: `${Math.floor(Math.random() * 12)}h ago`
+                };
+            });
+        };
+
+        let members = generateDummyData();
+        let currentFilter = { text: '', status: 'all' };
+
+        // --- 3. UI RENDERING ---
+
+        const getStatusBadge = (status) => {
+            const colors = {
+                'Online': 'bg-green-500/20 text-green-400 border-green-500/50',
+                'In Game': 'bg-blue-500/20 text-blue-400 border-blue-500/50',
+                'Looking for Group': 'bg-neonPink/20 text-neonPink border-neonPink/50 animate-pulse',
+                'Solo Play': 'bg-purple-500/20 text-purple-400 border-purple-500/50',
+                'Offline': 'bg-slate-700/50 text-slate-400 border-slate-600'
+            };
+            return `<span class="px-2 py-0.5 rounded text-xs border ${colors[status] || colors['Offline']} font-medium tracking-wide">${status}</span>`;
+        };
+
+        const renderDashboard = () => {
+            // Stats
+            document.getElementById('stat-online-count').textContent = members.filter(m => m.status !== 'Offline').length;
+
+            const lfgCount = members.filter(m => m.status === 'Looking for Group').length;
+            const lfgPercent = members.length > 0 ? Math.round((lfgCount / members.length) * 100) : 0;
+            document.getElementById('lfg-percentage').textContent = `${lfgPercent}%`;
+            document.getElementById('lfg-bar').style.width = `${lfgPercent}%`;
+
+            // Charts (Simplified)
+            const gameCounts = {};
+            members.forEach(m => m.games.forEach(g => gameCounts[g.title] = (gameCounts[g.title] || 0) + 1));
+            
+            document.getElementById('game-stats-container').innerHTML = Object.entries(gameCounts)
+                .sort((a, b) => b[1] - a[1]).slice(0, 5)
+                .map(([game, count]) => `
+                    <div class="group">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-slate-300">${game}</span>
+                            <span class="text-slate-500">${count}</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-cyan-600 to-blue-500 h-2 rounded-full" style="width: ${(count/members.length)*100}%"></div>
+                        </div>
+                    </div>`).join('');
+            
+            // Genre Tags
+            const genreCounts = {};
+            members.forEach(m => m.genres.forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1));
+            document.getElementById('genre-stats-container').innerHTML = Object.entries(genreCounts)
+                .sort((a,b)=>b[1]-a[1]).map(([g, c]) => `
+                    <span class="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs text-slate-300">
+                        ${g} <span class="text-neonCyan ml-1">${c}</span>
+                    </span>`).join('');
+        };
+
+        const renderMembers = () => {
+            const grid = document.getElementById('members-grid');
+            grid.innerHTML = '';
+            
+            const filtered = members.filter(m => {
+                const matchesText = m.name.toLowerCase().includes(currentFilter.text) || 
+                                    m.games.some(g => g.title.toLowerCase().includes(currentFilter.text));
+                const matchesStatus = currentFilter.status === 'all' || m.status === currentFilter.status;
+                return matchesText && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                document.getElementById('no-results').classList.remove('hidden');
+                return;
+            } else {
+                document.getElementById('no-results').classList.add('hidden');
+            }
+
+            filtered.forEach(member => {
+                const mainGame = member.games[0] || { title: 'No Games', rank: '-' };
+                const gameInfo = gameDatabase[mainGame.title] || defaultGameInfo;
+
+                const card = document.createElement('div');
+                card.className = 'bg-card border border-slate-700 rounded-xl p-5 card-hover relative group cursor-pointer overflow-hidden animate-fade-in';
+                card.onclick = () => openModal(member.id);
+
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-slate-600 to-transparent group-hover:via-neonCyan transition-all"></div>
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center text-2xl border border-slate-600 ${member.avatarColor || 'text-white'}">
+                                <i class="fa-solid ${member.avatar}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg leading-tight group-hover:text-neonCyan transition-colors">${member.name}</h3>
+                                <div class="text-xs text-slate-400 mt-1">${member.genres.join(', ')}</div>
+                            </div>
+                        </div>
+                        ${getStatusBadge(member.status)}
+                    </div>
+                    <div class="bg-slate-800/50 rounded p-2 border border-slate-700/50">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <span>Playing</span>
+                            <span class="text-neonCyan">${mainGame.rank}</span>
+                        </div>
+                        <div class="text-sm font-medium text-slate-200 truncate">
+                            <i class="fa-solid ${gameInfo.icon} mr-1 text-slate-500"></i> ${mainGame.title}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        // --- 4. MODAL & DETAILS ---
+        const openModal = (id) => {
+            const member = members.find(m => m.id === id);
+            if (!member) return;
+
+            // Generate Game Cards with Accordion/Details
+            const gamesHtml = member.games.map(g => {
+                const info = gameDatabase[g.title] || defaultGameInfo;
+                return `
+                <div class="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden mb-3">
+                    <div class="p-3 flex items-center gap-4 border-b border-slate-700/50">
+                        <div class="w-10 h-10 rounded bg-slate-700 flex items-center justify-center text-xl text-slate-300">
+                            <i class="fa-solid ${info.icon}"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold text-sm text-white">${g.title}</span>
+                                <span class="text-xs text-neonCyan border border-neonCyan/30 px-1 rounded">${g.rank}</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-1.5 rounded-full">
+                                <div class="bg-gradient-to-r from-neonPink to-purple-500 h-1.5 rounded-full" style="width: ${g.progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-900/50 text-sm">
+                        <div class="grid grid-cols-1 gap-2">
+                            <div>
+                                <span class="text-[10px] uppercase text-slate-500 font-bold tracking-wider">概要・目的</span>
+                                <p class="text-slate-300 text-xs mt-0.5">${info.description}</p>
+                                <p class="text-slate-400 text-xs mt-1 italic"><i class="fa-solid fa-flag-checkered text-neonYellow mr-1"></i> ${info.objective}</p>
+                            </div>
+                            <div class="mt-1 pt-2 border-t border-slate-700/50">
+                                <span class="text-[10px] uppercase text-neonPink font-bold tracking-wider">Appeal Point</span>
+                                <p class="text-slate-200 text-xs mt-0.5"><i class="fa-solid fa-star text-neonPink mr-1"></i> ${info.appeal}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="h-24 bg-gradient-to-r from-slate-800 to-indigo-900 relative">
+                    <div class="absolute -bottom-8 left-6">
+                        <div class="w-20 h-20 rounded-xl bg-slate-800 flex items-center justify-center text-4xl border-4 border-card ${member.avatarColor || 'text-white'} shadow-lg">
+                            <i class="fa-solid ${member.avatar}"></i>
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4">${getStatusBadge(member.status)}</div>
+                </div>
+                <div class="px-6 pt-10">
+                    <h2 class="text-2xl font-bold text-white font-orbitron">${member.name}</h2>
+                    <p class="text-slate-400 text-sm mt-1">ID: #000${member.id}</p>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-sm uppercase tracking-wider text-slate-500 font-bold mb-3">Active Games & Details</h3>
+                        <div class="max-h-80 overflow-y-auto pr-2 custom-scroll">
+                            ${gamesHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('member-modal').classList.remove('hidden');
+        };
+
+        const closeModal = (id) => {
+            document.getElementById(id).classList.add('hidden');
+        };
+
+        // --- 5. REGISTRATION LOGIC ---
+        const regModal = document.getElementById('register-modal');
+        const regForm = document.getElementById('register-form');
+        const gameSelect = document.getElementById('reg-game');
+
+        // Populate Game Select
+        Object.keys(gameDatabase).forEach(game => {
+            const option = document.createElement('option');
+            option.value = game;
+            option.textContent = game;
+            gameSelect.appendChild(option);
+        });
+
+        document.getElementById('btn-open-register').onclick = () => regModal.classList.remove('hidden');
+        document.getElementById('btn-cancel-reg').onclick = () => regModal.classList.add('hidden');
+        document.getElementById('reg-backdrop').onclick = () => regModal.classList.add('hidden');
+
+        regForm.onsubmit = (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const status = document.getElementById('reg-status').value;
+            const avatar = document.querySelector('input[name="avatar"]:checked').value;
+            const gameTitle = gameSelect.value;
+            const progress = document.getElementById('reg-progress').value;
+            const rank = document.getElementById('reg-rank').value || 'Beginner';
+
+            const newMember = {
+                id: members.length + 100, // Dummy ID
+                name: name,
+                avatar: avatar,
+                avatarColor: 'text-white', // Default
+                genres: [gameDatabase[gameTitle]?.genre || 'Gamer'], // Simplified genre logic
+                games: [{
+                    title: gameTitle,
+                    progress: progress,
+                    rank: rank
+                }],
+                status: status,
+                lastSeen: 'Just now'
+            };
+
+            members.unshift(newMember); // Add to top
+            
+            // UI Feedback
+            regModal.classList.add('hidden');
+            renderDashboard();
+            renderMembers();
+            regForm.reset();
+
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'translate-y-20');
+            setTimeout(() => toast.classList.add('opacity-0', 'translate-y-20'), 3000);
+        };
+
+        // --- 6. GLOBAL LISTENERS ---
+        document.getElementById('close-modal').onclick = () => closeModal('member-modal');
+        document.getElementById('modal-backdrop').onclick = () => closeModal('member-modal');
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            currentFilter.text = e.target.value.toLowerCase();
+            renderMembers();
+        });
+        document.getElementById('status-filter').addEventListener('change', (e) => {
+            currentFilter.status = e.target.value;
+            renderMembers();
+        });
+
+        // Initialize
+        renderDashboard();
+        renderMembers();
+
+    </script>
+</body>
+</html>
